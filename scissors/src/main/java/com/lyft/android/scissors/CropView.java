@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
@@ -50,6 +51,7 @@ public class CropView extends ImageView {
 
     private Paint viewportPaint = new Paint();
     private Paint bitmapPaint = new Paint();
+    private Paint backgroundPaint = new Paint();
 
     private Bitmap bitmap;
     private Matrix transform = new Matrix();
@@ -73,6 +75,7 @@ public class CropView extends ImageView {
 
         bitmapPaint.setFilterBitmap(true);
         viewportPaint.setColor(config.getViewportOverlayColor());
+        backgroundPaint.setColor(Color.WHITE);
     }
 
     @Override
@@ -104,6 +107,14 @@ public class CropView extends ImageView {
         canvas.drawRect(0, 0, getWidth(), top, viewportPaint);
         canvas.drawRect(getWidth() - left, top, getWidth(), getHeight() - top, viewportPaint);
         canvas.drawRect(0, getHeight() - top, getWidth(), getHeight(), viewportPaint);
+    }
+
+    private void drawBackground(Canvas canvas) {
+        final int viewportWidth = touchManager.getViewportWidth();
+        final int viewportHeight = touchManager.getViewportHeight();
+        final int left = (getWidth() - viewportWidth) / 2;
+        final int top = (getHeight() - viewportHeight) / 2;
+        canvas.drawRect(left, top, getWidth() - left, getHeight() - top, backgroundPaint);
     }
 
     @Override
@@ -230,6 +241,7 @@ public class CropView extends ImageView {
         final int top = (getBottom() - viewportHeight) / 2;
         canvas.translate(-left, -top);
 
+        drawBackground(canvas);
         drawBitmap(canvas);
 
         return dst;

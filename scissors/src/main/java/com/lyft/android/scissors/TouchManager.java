@@ -30,6 +30,7 @@ class TouchManager {
     private final TouchPoint[] previousPoints;
 
     private float minimumScale;
+    private float minimumScaleRatio;
     private float maximumScale;
     private Rect imageBounds;
     private float aspectRatio;
@@ -51,6 +52,7 @@ class TouchManager {
         points = new TouchPoint[maxNumberOfTouchPoints];
         previousPoints = new TouchPoint[maxNumberOfTouchPoints];
         minimumScale = cropViewConfig.getMinScale();
+        minimumScaleRatio = cropViewConfig.getMinScale();
         maximumScale = cropViewConfig.getMaxScale();
     }
 
@@ -211,8 +213,8 @@ class TouchManager {
     private void setMinimumScale() {
         final float fw = (float) viewportWidth / bitmapWidth;
         final float fh = (float) viewportHeight / bitmapHeight;
-        minimumScale = Math.max(fw, fh);
-        scale = Math.max(scale, minimumScale);
+        minimumScale = Math.max(fw, fh) * minimumScaleRatio;
+        scale = scale > 0 ? Math.max(scale, minimumScale) : Math.max(fw, fh);
     }
 
     private void updateScale() {
@@ -262,7 +264,7 @@ class TouchManager {
     }
 
     private static int computeLimit(int bitmapSize, int viewportSize) {
-        return (bitmapSize - viewportSize) / 2;
+        return (int) ((bitmapSize - viewportSize) / 2 + viewportSize * 0.9);
     }
 
     private static TouchPoint vector(TouchPoint a, TouchPoint b) {
